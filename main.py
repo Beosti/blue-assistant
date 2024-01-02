@@ -4,6 +4,7 @@ from typing import List
 
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
@@ -150,5 +151,6 @@ async def patreon(ctx):
     selected_gif = random.choice(gif_database_money)
     await ctx.send(selected_gif)
 
+load_dotenv()
 BOTTOKEN = os.getenv('BOTTOKEN')
 bot.run(BOTTOKEN)
