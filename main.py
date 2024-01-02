@@ -117,8 +117,8 @@ gif_database: List[str] = [
 
 @bot.event
 async def on_member_join(member):
-    channel_message = bot.get_channel(1191565117737943060)
-    channel_role = bot.get_channel(923348747352686645)
+    channel_message = bot.get_channel(1173654611320651827)
+    channel_role = bot.get_channel(1173652899788759162)
     role_channel_mention = channel_role.mention
     welcome_message = f"Welcome to Yuanno Inc. {member.mention} pick up your roles in {role_channel_mention}!"
     selected_gif = random.choice(gif_database)
