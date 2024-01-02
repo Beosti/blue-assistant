@@ -150,5 +150,5 @@ async def patreon(ctx):
     selected_gif = random.choice(gif_database_money)
     await ctx.send(selected_gif)
 
-BOTTOKEN = os.getenv("BOTTOKEN")
+BOTTOKEN = os.getenv('BOTTOKEN')
 bot.run(BOTTOKEN)
