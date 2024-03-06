@@ -117,7 +117,7 @@ gif_database: List[str] = [
 
 @bot.event
 async def on_member_join(member):
-    role = discord.utils.get(member.server.roles, name='seaman')
+    role = discord.utils.get(member.guild.roles, name='seaman')
     channel_message = bot.get_channel(1173654611320651827)
     channel_role = bot.get_channel(1173652899788759162)
     role_channel_mention = channel_role.mention
