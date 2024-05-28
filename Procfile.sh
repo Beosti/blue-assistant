@@ -1,2 +1,7 @@
-web: python server.py
-bot: python your_bot_script.py
+#!/bin/sh
+
+# Install dependencies
+pipenv install
+
+# Run the bot script
+pipenv run python server.py
