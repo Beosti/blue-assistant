@@ -5,12 +5,23 @@ from typing import List
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from flask import Flask
 import os
 
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
 
+app = Flask(__name__)
+
+
+@app.route('/')
+def home():
+    return "Server is running", 200
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 
 @bot.event
