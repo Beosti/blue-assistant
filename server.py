@@ -8,12 +8,9 @@ from dotenv import load_dotenv
 from flask import Flask
 import os
 
-
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
-
-
 
 app = Flask(__name__)
 
