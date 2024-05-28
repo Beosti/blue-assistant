@@ -5,6 +5,7 @@ from typing import List
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
@@ -152,6 +153,19 @@ async def patreon(ctx):
                    "more!:\nhttps://www.patreon.com/Beosti")
     selected_gif = random.choice(gif_database_money)
     await ctx.send(selected_gif)
+
+
+@bot.command()
+async def soulsdocs(ctx):
+    await ctx.send("Read some information about the Souls Awakening mod here!"
+                   "\n<https://github.com/Beosti/souls-awakening/blob/master/GAMEPLAY.md>")
+
+
+@bot.command()
+async def soulscode(ctx):
+    await ctx.send("You need the code for the souls awakening mod? Sure! Read this and you ready to go:"
+                   "\n<https://github.com/Beosti/souls-awakening/blob/master/README.md>")
+
 
 load_dotenv()
 BOTTOKEN = os.getenv('BOTTOKEN')
