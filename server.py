@@ -5,23 +5,11 @@ from typing import List
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from flask import Flask
 import os
 
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
-
-app = Flask(__name__)
-
-
-@app.route('/')
-def home():
-    return "Server is running", 200
-
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 
 @bot.event
@@ -32,6 +20,7 @@ async def on_ready():
     print("-----------------------")
 
 
+# Setup command for the role you can get yourself
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setup(ctx):
@@ -82,40 +71,43 @@ async def on_raw_reaction_remove(payload):
     await handle_reaction(payload, add=False)
 
 
+# Handles the reactions in general
 async def handle_reaction(payload, add=True):
-    # Check if the reaction is added to a message sent by the bot
-    if payload.user_id != bot.user.id:
-        channel = bot.get_channel(payload.channel_id)
-        message = await channel.fetch_message(payload.message_id)
+    # If the person reacting is the bot then exit
+    if payload.user_id == bot.user.id:
+        exit()
+    channel = bot.get_channel(payload.channel_id) # gets the channel id of the place reacting
+    message = await channel.fetch_message(payload.message_id) # get the message
 
-        # Check if the reacted message is the one sent by the bot
-        if message.author == bot.user:
-            roles_mapping = roles_data.get(message.id)
+    # If the reacted message is from the bot exit
+    if message.author != bot.user:
+        exit()
+    roles_mapping = roles_data.get(message.id)
 
-            if roles_mapping and payload.emoji.name in roles_mapping:
-                role_name = roles_mapping[payload.emoji.name]
+    if roles_mapping and payload.emoji.name in roles_mapping:
+        role_name = roles_mapping[payload.emoji.name]
 
-                # Get the role or create it if it doesn't exist
-                role = discord.utils.get(message.guild.roles, name=role_name)
-                if role is None:
-                    role = await message.guild.create_role(name=role_name)
+        # Get the role or create it if it doesn't exist
+        role = discord.utils.get(message.guild.roles, name=role_name)
+        if role is None:
+            role = await message.guild.create_role(name=role_name)
 
-                member = message.guild.get_member(payload.user_id)
+        member = message.guild.get_member(payload.user_id)
 
-                if role:
-                    if payload.message_id not in user_reactions:
-                        user_reactions[payload.message_id] = set()
+        if role:
+            if payload.message_id not in user_reactions:
+                user_reactions[payload.message_id] = set()
 
-                    if add and payload.user_id not in user_reactions[payload.message_id]:
-                        # User does not have the role, add it
-                        await member.add_roles(role)
+            if add and payload.user_id not in user_reactions[payload.message_id]:
+                # User does not have the role, add it
+                await member.add_roles(role)
 
-                        # Add the user to the set of users who have reacted to this message
-                        user_reactions[payload.message_id].add(payload.user_id)
-                    elif not add and payload.user_id in user_reactions[payload.message_id]:
-                        # User has already reacted, remove the reaction and the role
-                        await member.remove_roles(role)
-                        user_reactions[payload.message_id].remove(payload.user_id)
+                # Add the user to the set of users who have reacted to this message
+                user_reactions[payload.message_id].add(payload.user_id)
+            elif not add and payload.user_id in user_reactions[payload.message_id]:
+                # User has already reacted, remove the reaction and the role
+                await member.remove_roles(role)
+                user_reactions[payload.message_id].remove(payload.user_id)
 
 
 # Store roles data in a dictionary
@@ -146,7 +138,7 @@ async def on_member_join(member):
 
 @bot.command()
 async def hello(ctx):
-    await ctx.send("Hello, I am Assistant Blue!")
+    await ctx.send("Hello, I am Assistant Blue! Ready to assist anyone!")
 
 
 gif_database_money: List[str] = [
@@ -178,6 +170,11 @@ async def soulsdocs(ctx):
 async def soulscode(ctx):
     await ctx.send("You need the code for the souls awakening mod? Sure! Read this and you ready to go:"
                    "\n<https://github.com/Beosti/souls-awakening/blob/master/README.md>")
+
+
+@bot.command()
+async def bc(ctx):
+    await ctx.send("At the current time Block Clover is going through a major rework taking some time!")
 
 
 load_dotenv()

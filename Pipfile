@@ -6,7 +6,6 @@ verify_ssl = true
 [packages]
 discord.py = "*"
 python-dotenv = "*"
-flask = "*"
 [dev-packages]
 
 [requires]
