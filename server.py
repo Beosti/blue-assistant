@@ -1,3 +1,4 @@
+import asyncio
 import os
 import random
 from typing import List
@@ -6,10 +7,13 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
+import modrinth
 
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
+modrinthProjects = ['1234', '5987']
+cacheversions = []
 
 
 @bot.event
@@ -18,6 +22,44 @@ async def on_ready():
     print("-----------------------")
     print("Ready to assist anyone!")
     print("-----------------------")
+
+
+async def periodic_task(): # Checks every 30 minutes, then launches the function to check if update or not
+    while True:
+        await background_check_update()
+        await asyncio.sleep(1800)
+
+
+async def background_check_update():
+    global cacheversions  # Declare cacheversions as global
+    projects = modrinth.Projects.getProjects(modrinthProjects) # List in general of current projects
+    latestversions = [] # initializing empty list of latest versions
+
+    # going through a list of all current projects
+    for i in range(len(projects)):
+        latestVersion = modrinth.Projects.ModrinthProject(projects[i]).getLatestVersion()
+        latestversions.append(latestVersion) # Adding all the latestversions to a specific list of latest versions
+
+        # checks if said version already is in 'cache' or being tracked of; if it isn't then it's set in cache and no announcement
+        # assuming that if it isn't in cache the project already existed and wasn't updated just not queried
+        if i >= len(cacheversions):
+            cacheversions = latestversions
+            continue
+
+        if cacheversions[i] != latestversions[i]: # if it goes through the whole new and cached versions and they don't correspond it makes an announcement
+            await new_version_announcement(latestversions[i])
+
+    cacheversions = latestversions # Makes it so the cacheversions is always up to date
+
+
+async def new_version_announcement(projectid): # Specific method to handle the announcement of having a new version for a mod
+    announcement_update_channel = bot.get_channel(973320177817104394)
+    allowed_mentions = discord.AllowedMentions(everyone=True)
+    await announcement_update_channel.send(content="@everyone" +
+                                                   "\nA mod got an update! Get in here!"
+                                                   "\n" + modrinth.Projects.ModrinthProject(projectid).url +
+                                                   "\n" + modrinth.Projects.ModrinthProject(projectid).desc,
+                                           allowed_mentions=allowed_mentions)
 
 
 # Setup command for the role you can get yourself
@@ -76,8 +118,8 @@ async def handle_reaction(payload, add=True):
     # If the person reacting is the bot then exit
     if payload.user_id == bot.user.id:
         exit()
-    channel = bot.get_channel(payload.channel_id) # gets the channel id of the place reacting
-    message = await channel.fetch_message(payload.message_id) # get the message
+    channel = bot.get_channel(payload.channel_id)  # gets the channel id of the place reacting
+    message = await channel.fetch_message(payload.message_id)  # get the message
 
     # If the reacted message is from the bot exit
     if message.author != bot.user:
