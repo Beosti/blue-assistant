@@ -11,6 +11,7 @@ intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
 
+# TODO add a tracker for patreon posts
 
 @bot.event
 async def on_ready():
