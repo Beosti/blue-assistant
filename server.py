@@ -11,6 +11,7 @@ intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
 
+
 # TODO add a tracker for patreon posts
 
 @bot.event
@@ -77,8 +78,8 @@ async def handle_reaction(payload, add=True):
     # If the person reacting is the bot then exit
     if payload.user_id == bot.user.id:
         exit()
-    channel = bot.get_channel(payload.channel_id) # gets the channel id of the place reacting
-    message = await channel.fetch_message(payload.message_id) # get the message
+    channel = bot.get_channel(payload.channel_id)  # gets the channel id of the place reacting
+    message = await channel.fetch_message(payload.message_id)  # get the message
 
     # If the reacted message is from the bot exit
     if message.author != bot.user:
@@ -177,6 +178,10 @@ async def soulscode(ctx):
 async def bc(ctx):
     await ctx.send("At the current time Block Clover is going through a major rework taking some time!")
 
+@bot.command()
+async def code(ctx):
+    await ctx.send("You want to see my how I work? Sure! But check out my documentation first:"
+                   "\n")
 
 load_dotenv()
 BOTTOKEN = os.getenv('BOTTOKEN')
