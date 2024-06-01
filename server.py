@@ -12,8 +12,8 @@ import modrinth
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
-modrinthProjects = ['1234', '5987']
-cacheversions = []
+modrinthProjects = ['WzNAv1Om']
+cacheversions = ['IYPoQsun']
 
 
 @bot.event
