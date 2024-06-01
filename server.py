@@ -121,13 +121,13 @@ async def on_raw_reaction_remove(payload):
 async def handle_reaction(payload, add=True):
     # If the person reacting is the bot then exit
     if payload.user_id == bot.user.id:
-        exit()
+        return
     channel = bot.get_channel(payload.channel_id)  # gets the channel id of the place reacting
     message = await channel.fetch_message(payload.message_id)  # get the message
 
     # If the reacted message is from the bot exit
     if message.author != bot.user:
-        exit()
+        return
     roles_mapping = roles_data.get(message.id)
 
     if roles_mapping and payload.emoji.name in roles_mapping:
