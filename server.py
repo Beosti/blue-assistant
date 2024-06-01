@@ -225,7 +225,7 @@ async def bc(ctx):
 
 @bot.command()
 async def code(ctx):
-    await ctx.send("You want to see my how I work? Sure! But check out my documentation first:"
+    await ctx.send("You want to see how I work? Sure! But check out my documentation first:"
                    "\n<https://github.com/Beosti/blue-assistant/blob/main/README.md>")
 
 
