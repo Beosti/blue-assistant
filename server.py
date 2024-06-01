@@ -26,7 +26,7 @@ async def on_ready():
     print("-----------------------")
 
 
-async def periodic_task(): # Checks every 30 minutes, then launches the function to check if update or not
+async def periodic_task():  # Checks every 30 minutes, then launches the function to check if update or not
     while True:
         await background_check_update()
         await asyncio.sleep(1800)
@@ -34,13 +34,13 @@ async def periodic_task(): # Checks every 30 minutes, then launches the function
 
 async def background_check_update():
     global cacheversions  # Declare cacheversions as global
-    projects = modrinth.Projects.getProjects(modrinthProjects) # List in general of current projects
-    latestversions = [] # initializing empty list of latest versions
+    projects = modrinth.Projects.getProjects(modrinthProjects)  # List in general of current projects
+    latestversions = []  # initializing empty list of latest versions
 
     # going through a list of all current projects
     for i in range(len(projects)):
         latestVersion = modrinth.Projects.ModrinthProject(projects[i]).getLatestVersion()
-        latestversions.append(latestVersion) # Adding all the latestversions to a specific list of latest versions
+        latestversions.append(latestVersion)  # Adding all the latestversions to a specific list of latest versions
 
         # checks if said version already is in 'cache' or being tracked of; if it isn't then it's set in cache and no announcement
         # assuming that if it isn't in cache the project already existed and wasn't updated just not queried
@@ -48,13 +48,15 @@ async def background_check_update():
             cacheversions = latestversions
             continue
 
-        if cacheversions[i] != latestversions[i]: # if it goes through the whole new and cached versions and they don't correspond it makes an announcement
+        if cacheversions[i] != latestversions[
+            i]:  # if it goes through the whole new and cached versions and they don't correspond it makes an announcement
             await new_version_announcement(latestversions[i])
 
-    cacheversions = latestversions # Makes it so the cacheversions is always up to date
+    cacheversions = latestversions  # Makes it so the cacheversions is always up to date
 
 
-async def new_version_announcement(projectid): # Specific method to handle the announcement of having a new version for a mod
+async def new_version_announcement(
+        projectid):  # Specific method to handle the announcement of having a new version for a mod
     announcement_update_channel = bot.get_channel(973320177817104394)
     allowed_mentions = discord.AllowedMentions(everyone=True)
     await announcement_update_channel.send(content="@everyone" +
@@ -220,10 +222,12 @@ async def soulscode(ctx):
 async def bc(ctx):
     await ctx.send("At the current time Block Clover is going through a major rework taking some time!")
 
+
 @bot.command()
 async def code(ctx):
     await ctx.send("You want to see my how I work? Sure! But check out my documentation first:"
                    "\n")
+
 
 load_dotenv()
 BOTTOKEN = os.getenv('BOTTOKEN')
