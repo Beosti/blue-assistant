@@ -50,7 +50,7 @@ async def background_check_update():
 async def new_version_announcement(
         modrinthproject):  # Specific method to handle the announcement of having a new version for a mod
     announcement_update_channel = bot.get_channel(973320177817104394)
-    allowed_mentions = discord.AllowedMentions(everyone=False)
+    allowed_mentions = discord.AllowedMentions(everyone=True)
     await announcement_update_channel.send(content="@everyone" +
                                                    "\nA mod got an update! Get in here!"
                                                    "\n" + "https://modrinth.com/mod/" + format_string(
