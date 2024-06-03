@@ -5,6 +5,7 @@ from typing import List
 
 import discord
 from discord.ext import commands
+from discord.ext import tasks
 from dotenv import load_dotenv
 import os
 import modrinth
@@ -24,13 +25,15 @@ async def on_ready():
     print("-----------------------")
     print("Ready to assist anyone!")
     print("-----------------------")
-    bot.loop.create_task(periodic_task())
+    periodic_task.start()
 
 
-async def periodic_task():  # Checks every 30 minutes, then launches the function to check if update or not
-    while True:
+@tasks.loop(minutes=10)
+async def periodic_task():
+    try:
         await background_check_update()
-        await asyncio.sleep(1800)
+    except Exception as e:
+        print(f"Task exception: {e}")
 
 
 async def background_check_update():
@@ -49,8 +52,7 @@ async def background_check_update():
             cacheversions = latestversions
             continue
 
-        if cacheversions[i] != latestversions[
-            i]:  # if it goes through the whole new and cached versions and they don't correspond it makes an announcement
+        if cacheversions[i] != latestversions[i]:  # if it goes through the whole new and cached versions and they don't correspond it makes an announcement
             await new_version_announcement(latestversions[i])
 
     cacheversions = latestversions  # Makes it so the cacheversions is always up to date
