@@ -24,6 +24,7 @@ async def on_ready():
     print("-----------------------")
     print("Ready to assist anyone!")
     print("-----------------------")
+    bot.loop.create_task(periodic_task())
 
 
 async def periodic_task():  # Checks every 30 minutes, then launches the function to check if update or not
