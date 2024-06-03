@@ -13,9 +13,8 @@ import modrinth
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
-modrinthProjects = ['WzNAv1Om']
 cacheversions = 'IYPoQsun'
-
+souls_awakening_project = modrinth.Projects.ModrinthProject("WzNAv1Om")
 
 # TODO add a tracker for patreon posts
 
@@ -33,16 +32,19 @@ async def periodic_task():
     try:
         await background_check_update()
     except Exception as e:
-        print(f"Task exception: {e}")
+        print(f"Task exception at periodic task: {e}")
 
 
 async def background_check_update():
     global cacheversions  # Declare cacheversions as global
-    souls_awakening_project = modrinth.Projects.ModrinthProject("WzNAv1Om")
-    latest_version = souls_awakening_project.getLatestVersion()
-    if latest_version != cacheversions:
-        await new_version_announcement(souls_awakening_project)
+
+    try:
+        latest_version = souls_awakening_project.getLatestVersion()
+        if latest_version != cacheversions:
+            await new_version_announcement(souls_awakening_project)
         cacheversions = latest_version
+    except Exception as e:
+        print(f"Task exception at the getting of latest update: {e}")
 
 
 async def new_version_announcement(
@@ -51,9 +53,23 @@ async def new_version_announcement(
     allowed_mentions = discord.AllowedMentions(everyone=True)
     await announcement_update_channel.send(content="@everyone" +
                                                    "\nA mod got an update! Get in here!"
-                                                   "\n" + modrinthproject.url +
-                                                   "\n" + modrinthproject.desc,
+                                                   "\n" + "https://modrinth.com/mod/" + format_string(modrinthproject.getLatestVersion().name) +
+                                           "\n" + "Check the link for the changelog!",
                                            allowed_mentions=allowed_mentions)
+
+
+def format_string(input_str):
+    # Split the input string by spaces
+    components = input_str.split()
+
+    # Convert each component to lowercase
+    components = [component.lower() for component in components]
+
+    # Join the components with "/"
+    formatted_str = '-'.join(components[:-1]) + '/version/' + components[-1]
+
+    return formatted_str
+
 
 
 # Setup command for the role you can get yourself
