@@ -1,8 +1,7 @@
-import asyncio
-import os
 import random
 from typing import List
 
+import re
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -13,8 +12,8 @@ import modrinth
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
-cacheversions = 'IYPoQsun'
 souls_awakening_project = modrinth.Projects.ModrinthProject("WzNAv1Om")
+
 
 # TODO add a tracker for patreon posts
 
@@ -36,13 +35,14 @@ async def periodic_task():
 
 
 async def background_check_update():
-    global cacheversions  # Declare cacheversions as global
-
     try:
-        latest_version = souls_awakening_project.getLatestVersion()
+        latest_version = souls_awakening_project.getLatestVersion().version
+        cacheversions = get_cache_version()
+        print(latest_version)
+        print(cacheversions)
         if latest_version != cacheversions:
             await new_version_announcement(souls_awakening_project)
-        cacheversions = latest_version
+        modify_cache_version(souls_awakening_project.getLatestVersion().version)
     except Exception as e:
         print(f"Task exception at the getting of latest update: {e}")
 
@@ -50,11 +50,12 @@ async def background_check_update():
 async def new_version_announcement(
         modrinthproject):  # Specific method to handle the announcement of having a new version for a mod
     announcement_update_channel = bot.get_channel(973320177817104394)
-    allowed_mentions = discord.AllowedMentions(everyone=True)
+    allowed_mentions = discord.AllowedMentions(everyone=False)
     await announcement_update_channel.send(content="@everyone" +
                                                    "\nA mod got an update! Get in here!"
-                                                   "\n" + "https://modrinth.com/mod/" + format_string(modrinthproject.getLatestVersion().name) +
-                                           "\n" + "Check the link for the changelog!",
+                                                   "\n" + "https://modrinth.com/mod/" + format_string(
+        modrinthproject.getLatestVersion().name) +
+                                                   "\n" + "Check the link for the changelog!",
                                            allowed_mentions=allowed_mentions)
 
 
@@ -70,6 +71,34 @@ def format_string(input_str):
 
     return formatted_str
 
+
+def get_cache_version():
+    file_path = 'publicids'
+    with open(file_path, 'r') as file:
+        content = file.read()
+
+    # Retrieve the value of cacheversions using regular expressions
+    matches = re.search(r"cacheversions\s*=\s*'([^']+)'", content)
+
+    if matches:
+        return matches.group(1)  # Return only the matched content within the quotes
+    else:
+        return None  # Return None if no match is found
+
+
+def modify_cache_version(new_version):
+    file_path = 'publicids'
+
+    # Change the value of cacheversions to something else
+    new_version_value = "new_version_value_here"
+
+    with open(file_path, 'r') as file:
+        content = file.read()
+
+    # Replace the value of cacheversions with the new version value
+    modified_content = re.sub(r"cacheversions\s*=\s*'([^']+)'", f"cacheversions = '{new_version}'", content)
+    with open(file_path, 'w') as file:
+        file.write(modified_content)
 
 
 # Setup command for the role you can get yourself
