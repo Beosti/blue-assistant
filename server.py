@@ -15,8 +15,6 @@ bot = commands.Bot(command_prefix='?', intents=intents)
 souls_awakening_project = modrinth.Projects.ModrinthProject("WzNAv1Om")
 
 
-# TODO add a tracker for patreon posts
-
 @bot.event
 async def on_ready():
     await bot.change_presence(status=discord.Status.online, activity=discord.Game('Assisting Beosti'))
@@ -38,8 +36,6 @@ async def background_check_update():
     try:
         latest_version = souls_awakening_project.getLatestVersion().version
         cacheversions = get_cache_version()
-        print(latest_version)
-        print(cacheversions)
         if latest_version != cacheversions:
             await new_version_announcement(souls_awakening_project)
         modify_cache_version(souls_awakening_project.getLatestVersion().version)
