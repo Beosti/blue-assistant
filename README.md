@@ -1,4 +1,4 @@
-# Assistant-blue (version 0.1.2)
+# Assistant-blue (version 0.2.0)
 ## General explanation
 This is a discord bot for my discord server [Yuanno Inc.](https://discord.gg/pqJP5uHdc2)
 

@@ -8,6 +8,7 @@ from discord.ext import tasks
 from dotenv import load_dotenv
 import os
 import modrinth
+import aiosqlite
 
 intents = discord.Intents.all()
 
@@ -21,7 +22,78 @@ async def on_ready():
     print("-----------------------")
     print("Ready to assist anyone!")
     print("-----------------------")
+    setattr(bot, "db", await aiosqlite.connect("level.db"))
+    async with bot.db.cursor() as cursor:
+        await cursor.execute("CREATE TABLE IF NOT EXISTS levels (level INTEGER, xp INTEGER, user INTEGER, "
+                             "guild INTEGER)")
     periodic_task.start()
+
+
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    author = message.author
+    guild = message.guild
+    async with bot.db.cursor() as cursor:
+        await cursor.execute("SELECT xp FROM levels WHERE user = ? AND guild = ?", (author.id, guild.id,))
+        xp = await cursor.fetchone()
+        await cursor.execute("SELECT level FROM levels WHERE user = ? AND guild = ?", (author.id, guild.id,))
+        level = await cursor.fetchone()
+
+        if not xp or not level:
+            await cursor.execute("INSERT INTO levels (level, xp, user, guild) VALUES (?, ?, ? ,?)",
+                                 (0, 0, author.id, guild.id,))
+
+        try:
+            xp = xp[0]
+            level = level[0]
+        except TypeError:
+            xp = 0
+            level = 0
+
+        if level < 5:
+            xp += random.randint(1, 3)
+            await cursor.execute("UPDATE level SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
+        else:
+            rand = random.randint(1, (level // 4))
+            if rand == 1:
+                xp += random.randint(1, 3)
+                await cursor.execute("UPDATE level SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
+
+        if xp >= 100:
+            level += 1
+            await cursor.execute("UPDATE level SET level = ? WHERE user = ? AND guild = ?",
+                                 (level, author.id, guild.id,))
+            await cursor.execute("UPDATE level SET xp = ? WHERE user ? AND guild = ?", (0, author.id, guild.id,))
+            channel_message = bot.get_channel(1039991334443941978)  # bot channel
+            await channel_message.send(f"{author.mention} has leveled up to level **{level}**!")
+    await bot.db.commit()
+
+
+@bot.command(aliases=['lvl', 'rank', 'r'])
+async def level(ctx, member: discord.Member = None):
+    if member is None:
+        member = ctx.author
+    async with bot.db.cursor() as cursor:
+        await cursor.execute("SELECT xp FROM levels WHERE user = ? AND guild = ?", (member.id, ctx.guild.id,))
+        xp = await cursor.fetchone()
+        await cursor.execute("SELECT level FROM levels WHERE user = ? AND guild = ?", (member.id, ctx.guild.id,))
+        level = await cursor.fetchone()
+
+        if not xp or not level:
+            await cursor.execute("INSERT INTO levels (level, xp, user, guild) VALUES (?, ?, ? ,?)",
+                                 (0, 0, member.id, ctx.guild.id,))
+
+        try:
+            xp = xp[0]
+            level = level[0]
+        except TypeError:
+            xp = 0
+            level = 0
+
+        em = discord.Embed(title=f"{member.name}'s Level", description=f"Level: '{level}\nXP: '{xp}'")
+        await ctx.send(embed=em)
 
 
 @tasks.loop(minutes=10)
@@ -200,7 +272,7 @@ gif_database: List[str] = [
 
 @bot.event
 async def on_member_join(member):
-    role = discord.utils.get(member.guild.roles, name='seaman')
+    role = discord.utils.get(member.guild.roles, name='Chore Boy')
     channel_message = bot.get_channel(1173654611320651827)
     channel_role = bot.get_channel(1173652899788759162)
     role_channel_mention = channel_role.mention
