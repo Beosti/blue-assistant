@@ -232,7 +232,7 @@ gif_database_money: List[str] = [
 @bot.command()
 async def patreon(ctx):
     await ctx.send("Subscribe to Beosti's patreon for teasers, overall suport and "
-                   "more!:\nhttps://www.patreon.com/Beosti")
+                   "more!:\n<https://www.patreon.com/Beosti>")
     selected_gif = random.choice(gif_database_money)
     await ctx.send(selected_gif)
 
