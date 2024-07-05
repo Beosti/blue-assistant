@@ -22,8 +22,6 @@ def webhook():
     return jsonify(data), 200
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, ssl_context='adhoc')
 
 intents = discord.Intents.all()
 
@@ -42,6 +40,7 @@ async def on_ready():
         await cursor.execute("CREATE TABLE IF NOT EXISTS levels (level INTEGER, xp INTEGER, user INTEGER, "
                              "guild INTEGER)")
     periodic_task.start()
+    app.run(host='0.0.0.0', port=5000, ssl_context='adhoc')
 
 
 @bot.event
