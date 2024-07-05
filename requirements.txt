@@ -1,3 +1,6 @@
 discord~=2.3.2
 python-dotenv~=1.0.1
 modrinth~=0.1.5
+
+aiosqlite~=0.20.0
+Flask~=3.0.3
