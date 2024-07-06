@@ -77,6 +77,7 @@ async def on_message(message):
             channel_message = bot.get_channel(1039991334443941978)  # bot channel
             await channel_message.send(f"{author.mention} has leveled up to level **{level}**!")
     await bot.db.commit()
+    await bot.process_commands(message)
 
 
 @bot.command(aliases=['lvl', 'rank', 'r'])

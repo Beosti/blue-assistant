@@ -12,6 +12,8 @@ When a person enters the discord they get a random gif + welcome message in the 
 When someone enters the server they automatically get a role (seamen).
 ### Commands
 There are some basic commands that do something when used.
+### Level system
+There is a basic level system where talking will gain xp and levels, after a while you get certain new roles
 
 ## Contributing
 You can always contribute by making a pull request like so:
