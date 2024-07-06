@@ -11,7 +11,6 @@ import os
 import modrinth
 import aiosqlite
 
-
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='?', intents=intents)
@@ -34,6 +33,9 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     if message.author.bot:
+        return
+    if message.content[0] == '?':
+        await bot.process_commands(message)
         return
     author = message.author
     guild = message.guild
@@ -63,7 +65,8 @@ async def on_message(message):
             rand = random.randint(1, (level // 4))
             if rand == 1:
                 xp += random.randint(1, 3)
-                await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
+                await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?",
+                                     (xp, author.id, guild.id,))
 
         if xp >= 100:
             level += 1
@@ -73,18 +76,23 @@ async def on_message(message):
                 await member.add_roles(role)
             await cursor.execute("UPDATE levels SET level = ? WHERE user = ? AND guild = ?",
                                  (level, author.id, guild.id,))
-            await cursor.execute("UPDATE levels SET xp = ? WHERE user ? AND guild = ?", (0, author.id, guild.id,))
+            await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (0, author.id, guild.id,))
             channel_message = bot.get_channel(1039991334443941978)  # bot channel
             await channel_message.send(f"{author.mention} has leveled up to level **{level}**!")
     await bot.db.commit()
-    await bot.process_commands(message)
+
+
+async def starts_with_question_mark(s):
+    if s:
+        return s[0] == '?'
+    else:
+        return False
 
 
 @bot.command(aliases=['lvl', 'rank', 'r'])
 async def level(ctx, member: discord.Member = None):
     if member is None:
         member = ctx.author
-    print("command")
     async with bot.db.cursor() as cursor:
         await cursor.execute("SELECT xp FROM levels WHERE user = ? AND guild = ?", (member.id, ctx.guild.id,))
         xp = await cursor.fetchone()
