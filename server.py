@@ -83,6 +83,7 @@ async def on_message(message):
 async def level(ctx, member: discord.Member = None):
     if member is None:
         member = ctx.author
+    print("command")
     async with bot.db.cursor() as cursor:
         await cursor.execute("SELECT xp FROM levels WHERE user = ? AND guild = ?", (member.id, ctx.guild.id,))
         xp = await cursor.fetchone()
