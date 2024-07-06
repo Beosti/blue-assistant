@@ -37,8 +37,8 @@ async def on_message(message):
         return
     author = message.author
     guild = message.guild
-    print("id of user: " + message.author.id)
-    print("name of user: " + message.guild.get_member(message.author.id))
+    #print(message.author.id)
+    #print(message.guild.get_member(message.author.id))
     async with bot.db.cursor() as cursor:
         await cursor.execute("SELECT xp FROM levels WHERE user = ? AND guild = ?", (author.id, guild.id,))
         xp = await cursor.fetchone()
@@ -58,18 +58,22 @@ async def on_message(message):
 
         if level < 5:
             xp += random.randint(1, 3)
-            await cursor.execute("UPDATE level SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
+            await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
         else:
             rand = random.randint(1, (level // 4))
             if rand == 1:
                 xp += random.randint(1, 3)
-                await cursor.execute("UPDATE level SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
+                await cursor.execute("UPDATE levels SET xp = ? WHERE user = ? AND guild = ?", (xp, author.id, guild.id,))
 
         if xp >= 100:
             level += 1
-            await cursor.execute("UPDATE level SET level = ? WHERE user = ? AND guild = ?",
+            if level == 5:
+                member = message.guild.get_member(message.author.id)
+                role = get(member.guild.roles, id=1214769748047433740)
+                await member.add_roles(role)
+            await cursor.execute("UPDATE levels SET level = ? WHERE user = ? AND guild = ?",
                                  (level, author.id, guild.id,))
-            await cursor.execute("UPDATE level SET xp = ? WHERE user ? AND guild = ?", (0, author.id, guild.id,))
+            await cursor.execute("UPDATE levels SET xp = ? WHERE user ? AND guild = ?", (0, author.id, guild.id,))
             channel_message = bot.get_channel(1039991334443941978)  # bot channel
             await channel_message.send(f"{author.mention} has leveled up to level **{level}**!")
     await bot.db.commit()
