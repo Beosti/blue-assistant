@@ -5,6 +5,7 @@ import re
 import discord
 from discord.ext import commands
 from discord.ext import tasks
+from discord.utils import get
 from dotenv import load_dotenv
 import os
 import modrinth
@@ -36,6 +37,8 @@ async def on_message(message):
         return
     author = message.author
     guild = message.guild
+    print("id of user: " + message.author.id)
+    print("name of user: " + message.guild.get_member(message.author.id))
     async with bot.db.cursor() as cursor:
         await cursor.execute("SELECT xp FROM levels WHERE user = ? AND guild = ?", (author.id, guild.id,))
         xp = await cursor.fetchone()
@@ -273,7 +276,7 @@ gif_database: List[str] = [
 
 @bot.event
 async def on_member_join(member):
-    role = discord.utils.get(member.guild.roles, name='Chore Boy')
+    role = discord.utils.get(member.guild.roles, id=1253478904291922012)
     channel_message = bot.get_channel(1173654611320651827)
     channel_role = bot.get_channel(1173652899788759162)
     role_channel_mention = channel_role.mention
